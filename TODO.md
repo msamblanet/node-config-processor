@@ -1,3 +1,1 @@
-# Node Typescript Template - TODO List
-
-Replace this content for your project
+# Node Config Processor - TODO List
