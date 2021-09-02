@@ -16,26 +16,13 @@ Each string value in a config object is evaluated and processed.  Prefix values 
 - ```FILE:``` indicates that the value should be read from a file.  The value is recursively processed.
 - ```OBF:``` indicates that the value is obfuscated.  The decoded value is used raw and NOT recursively processed.
 
-## Usage
+## Recommended Usage
 
-```
-npm install @msamblanet/node-config-processor
+The following example shows using this module for configuring a main application using ```dotenv``` an ```config```.  Other modules can be used and other patterns are psosible.
 
-# The following are optional
-npm install config json5 js-yaml
-```
+Setup: ```npm install @msamblanet/node-config-processor config json5 js-yaml dotenv extend @types/extend```
 
-```
-import config from "config";
-import ConfigProcessor from "@msamblanet/node-config-processor";
-
-const new ConfigProcessor(config).process();
-```
-
-### Recommended main
-```npm install @msamblanet/node-config-processor config json5 js-yaml dotenv extend @types/extend```
-
-```
+```typescript
 // main.ts
 import dotenv from 'dotenv';
 dotenv.config();
@@ -45,13 +32,14 @@ import ConfigProcessor from "@msamblanet/node-config-processor";
 new ConfigProcessor(config).process();
 
 // Your application imports and code go below this line...
+// DO NOT put other imports above this line to ensure nothing else changes the bootstrap order...
 import Foo from "./Foo";
 const foo = new Foo(config.get("foo"));
 
 console.log(foo.doStuff());
 ```
 
-```
+```typescript
 // Foo.ts
 import extend from "extend";
 import type { ConfigOverrides } from "@msamblanet/node-config-processor";
@@ -61,7 +49,7 @@ export type FooConfig {
     b: number;
 }
 
-export type FooConfigOverrides
+export type FooConfigOverrides = ConfigOverrides<FooConfig>;
 
 export class Foo {
     static readonly DEFAULT_CONFIG = {
@@ -80,6 +68,33 @@ export class Foo {
 }
 
 export default Foo;
+```
+
+```yaml
+# ./config/default.yaml
+foo
+    a: 42
+    b: 64767
+
+# ./config/development.yaml
+configProcessor
+    obfuscator
+        defaultAlg: DEV21
+        algSettings:
+            DEV21:
+                name: DEV21
+                base: DEFAULT
+                password: ENV:DEV21_OBF_PASSWORD
+
+# ./config/production.yaml
+configProcessor
+    obfuscator
+        defaultAlg: PROD21
+        algSettings:
+            PROD21:
+                name: PROD21
+                base: DEFAULT
+                password: ENV:PROD21_OBF_PASSWORD
 ```
 
 ### Recommended package
