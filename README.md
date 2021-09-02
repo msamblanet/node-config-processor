@@ -26,11 +26,63 @@ npm install config json5 js-yaml
 ```
 
 ```
-require ConfigProcessor from "@msamblanet/node-config-processor";
-require config from "config";
+import config from "config";
+import ConfigProcessor from "@msamblanet/node-config-processor";
 
 const new ConfigProcessor(config).process();
 ```
+
+### Recommended main
+```npm install @msamblanet/node-config-processor config json5 js-yaml dotenv extend @types/extend```
+
+```
+// main.ts
+import dotenv from 'dotenv';
+dotenv.config();
+
+import config from "config";
+import ConfigProcessor from "@msamblanet/node-config-processor";
+new ConfigProcessor(config).process();
+
+// Your application imports and code go below this line...
+import Foo from "./Foo";
+const foo = new Foo(config.get("foo"));
+
+console.log(foo.doStuff());
+```
+
+```
+// Foo.ts
+import extend from "extend";
+import type { ConfigOverrides } from "@msamblanet/node-config-processor";
+
+export type FooConfig {
+    a: number;
+    b: number;
+}
+
+export type FooConfigOverrides
+
+export class Foo {
+    static readonly DEFAULT_CONFIG = {
+        a: 1,
+        b: 2
+    }
+    readonly config: FooConfig
+
+    constructor Foo(config: FooConfigOverrides) {
+        this.config = extend(true, {}, Foo.DEFAULT_CONFIG, config);
+    }
+
+    doStuff() {
+        return config.a + config.b;
+    }
+}
+
+export default Foo;
+```
+
+### Recommended package
 
 ## API (core)
 

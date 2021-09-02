@@ -1,14 +1,14 @@
 /* This is needed to allow this to work in ts-node for testing - see: https://github.com/TypeStrong/ts-node#help-my-types-are-missing */
 /// <reference types="./@types/msamblanet__deep-iterator" />
-import { Obfuscator, ObfuscatorConfig } from "@msamblanet/node-obfuscator";
+import { Obfuscator, ObfuscatorConfigOverrides } from "@msamblanet/node-obfuscator";
 import { KeyType, NodeType } from "@msamblanet/deep-iterator";
 import deepIterator from "@msamblanet/deep-iterator";
 import extend from "extend";
 import fs from "fs";
 
 // https://stackoverflow.com/questions/41980195/recursive-partialt-in-typescript
-export type RecursivePartial<T> = {
-    [P in keyof T]?: RecursivePartial<T[P]>;
+export type ConfigOverrides<T> = {
+    [P in keyof T]?: ConfigOverrides<T[P]>;
 };
 
 export interface RootConfig extends Record<KeyType, unknown> {
@@ -16,12 +16,12 @@ export interface RootConfig extends Record<KeyType, unknown> {
 }
 
 export interface ConfigProcessorConfig extends Record<KeyType, unknown> {
-    obfuscator?: RecursivePartial<ObfuscatorConfig>
+    obfuscator: ObfuscatorConfigOverrides
 }
 
 export class ConfigProcessor<X extends RootConfig> {
     static readonly OP_MATCHER = /^(RAW|HEX|B64|ENV|FILE|OBF):/;
-    static readonly DEFAULT_CONFIG: ConfigProcessorConfig = {}
+    static readonly DEFAULT_CONFIG: ConfigOverrides<ConfigProcessorConfig> = {}
 
     readonly data: X
     readonly config: ConfigProcessorConfig
