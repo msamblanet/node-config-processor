@@ -44,6 +44,10 @@ export class ConfigProcessor<X extends RootConfig> {
         return new Obfuscator((this.config as ConfigProcessorConfig).obfuscator);
     }
 
+    obfuscateString(val: string, alg?: string): string {
+        return this.obfuscator.encodeString(val, alg);
+    }
+
     process(): X {
         return this.processObject(this.data) as X;
     }

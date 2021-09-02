@@ -42,6 +42,10 @@ Constructs the config processor.  ```data``` is the configuration to process.  N
 
 Processes the data passed into the constructor, returning the config object for chaining.  Note that the object is modified IN-PLACE and is NOT cloned.
 
+### ConfigProcessor.obfuscateString(val, alg)
+
+Obfuscates ```val``` using the configured obfucator.  If ```alg``` is specified, it is used as the obfuscaion alogrithm.
+
 ## API (extensions)
 
 The following methods are intended for extending/customizing the module if needed.  Subclass before using the config...
