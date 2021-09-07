@@ -1,7 +1,7 @@
 {
     "name": "@msamblanet/node-config-processor",
     "version": "0.1.0",
-    "private": true,
+    "private": false,
     "description": "Process config data with basic templating",
     "author": "Michael Samblanet <michael@samblanet.com>",
     "license": "Apache-2.0",

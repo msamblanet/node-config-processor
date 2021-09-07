@@ -20,7 +20,17 @@ Each string value in a config object is evaluated and processed.  Prefix values 
 
 The following example shows using this module for configuring a main application using ```dotenv``` an ```config```.  Other modules can be used and other patterns are psosible.
 
-Setup: ```npm install @msamblanet/node-config-processor config json5 js-yaml dotenv extend @types/extend```
+Setup:
+
+```bash
+# For main applications
+npm install @msamblanet/node-config-processor config json5 js-yaml dotenv extend
+npm install --save-dev @types/extend
+
+# For modules
+npm install extend
+npm install --save-dev @msamblanet/node-config-processor @types/extend
+```
 
 ```typescript
 // main.ts
@@ -37,6 +47,11 @@ import Foo from "./Foo";
 const foo = new Foo(config.get("foo"));
 
 console.log(foo.doStuff());
+
+// Or if you need programatic injection also...later configs take precidence over earlier ones
+const foo2 = new Foo(config.get("foo"), { b: 30127 });
+console.log(foo2.doStuff());
+
 ```
 
 ```typescript
@@ -44,7 +59,7 @@ console.log(foo.doStuff());
 import extend from "extend";
 import type { ConfigOverrides } from "@msamblanet/node-config-processor";
 
-export type FooConfig {
+export type = FooConfig {
     a: number;
     b: number;
 }
@@ -52,14 +67,14 @@ export type FooConfig {
 export type FooConfigOverrides = ConfigOverrides<FooConfig>;
 
 export class Foo {
-    static readonly DEFAULT_CONFIG = {
+    static readonly DEFAULT_CONFIG: FooConfig = {
         a: 1,
         b: 2
     }
     readonly config: FooConfig
 
-    constructor Foo(config: FooConfigOverrides) {
-        this.config = extend(true, {}, Foo.DEFAULT_CONFIG, config);
+    constructor(...config: FooConfigOverrides) {
+        this.config = extend.apply(null, [true, {}, OfficeSdk.DEFAULT_CONFIG, ...config??[]]);
     }
 
     doStuff() {
@@ -68,6 +83,7 @@ export class Foo {
 }
 
 export default Foo;
+
 ```
 
 ```yaml
