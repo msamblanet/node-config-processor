@@ -1,28 +1,30 @@
 /* This is needed to allow this to work in ts-node for testing - see: https://github.com/TypeStrong/ts-node#help-my-types-are-missing */
 /// <reference types="./@types/msamblanet__deep-iterator" />
 import { Obfuscator, ObfuscatorConfigOverrides } from "@msamblanet/node-obfuscator";
-import { NodeType } from "@msamblanet/deep-iterator";
+//import { NodeType } from "@msamblanet/deep-iterator";
 import deepIterator from "@msamblanet/deep-iterator";
 import extend from "extend";
 import fs from "fs";
 import crypto from "crypto";
 
-export type ConfigOverrides<T> = null | undefined | {
-    [P in keyof T]?: ConfigOverrides<T[P]>;
+export type AllOptional<T> = {
+    [P in keyof T]?: T[P];
+};
+export type RecursiveAllOptional<T> = {
+    [P in keyof T]?: RecursiveAllOptional<T[P]>;
 };
 
 export type Config = Record<string | number | symbol, unknown>
-export type Overrides = ConfigOverrides<Config>
 
 export interface ConfigProcessorConfig extends Config {
     obfuscator?: ObfuscatorConfigOverrides
 }
-export type ConfigProcessorConfigOverrides = ConfigOverrides<ConfigProcessorConfig>;
+export type ConfigProcessorConfigOverrides = AllOptional<ConfigProcessorConfig>;
 
 export interface RootConfig extends Config {
     configProcessor: ConfigProcessorConfig
 }
-export type RootConfigOverrides = ConfigOverrides<RootConfig>;
+export type RootConfigOverrides = AllOptional<RootConfig>;
 
 export class ConfigProcessor<X extends RootConfig> {
     public static readonly OP_MATCHER = /^(RAW|HEX|B64|ENV|FILE|OBF|SFILE([0-9]+)):/;
@@ -32,7 +34,7 @@ export class ConfigProcessor<X extends RootConfig> {
     private readonly config: ConfigProcessorConfig
     private readonly obfuscator: Obfuscator
 
-    public constructor(...config: ConfigOverrides<X>[]) {
+    public constructor(...config: (RootConfigOverrides|null|undefined)[]) {
         this.rootConfig = extend(true, { configProcessor: {} }, ...config);
 
         const rawConfig = extend(true, {}, ConfigProcessor.DEFAULT_CONFIG, this.rootConfig.configProcessor);
@@ -62,10 +64,14 @@ export class ConfigProcessor<X extends RootConfig> {
         return data;
     }
 
-    protected ensureSFile(filename: string, numBytes: number): void {
+    protected ensureSFile(filename: string, numBytes: number): string {
         if (!fs.existsSync(filename)) {
-            fs.writeFileSync(filename, crypto.randomBytes(numBytes).toString("hex"));
+            const data = crypto.randomBytes(numBytes).toString("hex");
+            fs.writeFileSync(filename, data);
+            return data;
         }
+
+        return fs.readFileSync(filename, { encoding: "utf8" });
     }
 
     protected processNode(nodeDesc: unknown, valWithOp: string): unknown {
@@ -77,10 +83,7 @@ export class ConfigProcessor<X extends RootConfig> {
 
         const val = valWithOp.substring(matches[0].length);
 
-        if (matches[1].startsWith("SFILE")) {
-            this.ensureSFile(val, parseInt(matches[2]));
-            matches[1] = "FILE";
-        }
+        if (matches[1].startsWith("SFILE")) return this.ensureSFile(val, parseInt(matches[2]));
 
         switch (matches[1]) {
             case "RAW": return val;

@@ -118,3 +118,24 @@ test("Verify SFILE", () => {
     }
 
 });
+
+test("Verify Config arg patterns", () => {
+    expect(new Lib.ConfigProcessor(null).process()).toMatchObject({});
+    expect(new Lib.ConfigProcessor(undefined).process()).toMatchObject({});
+    expect(new Lib.ConfigProcessor({}).process()).toMatchObject({});
+
+    expect(new Lib.ConfigProcessor({ a: 1 }, { b: 2 }).process()).toMatchObject({ a: 1, b: 2 });
+    expect(new Lib.ConfigProcessor({ a: 1 }, { a: 2 }).process()).toMatchObject({ a: 2 });
+    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined).process()).toMatchObject({ a: 1 });
+    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: 2 }).process()).toMatchObject({ a: 2 });
+    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: "" }).process()).toMatchObject({ a: "" });
+    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: null }).process()).toMatchObject({ a: null });
+    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: undefined }).process()).toMatchObject({ a: 1 });
+
+    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }).process()).toMatchObject({ a: { b: 1, c: 2 } });
+    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: { c: 3, d: 4 } }).process()).toMatchObject({ a: { b: 1, c: 3, d: 4 } });
+    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: 9 }).process()).toMatchObject({ a: 9 });
+    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: null }).process()).toMatchObject({ a: null });
+    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: undefined }).process()).toMatchObject({ a: { b: 1, c: 2 } });
+
+});
