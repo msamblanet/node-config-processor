@@ -58,11 +58,11 @@
     },
     "dependencies": {
         "@msamblanet/deep-iterator": "^1.1.1",
-        "@msamblanet/node-obfuscator": "^1.2.0",
+        "@msamblanet/node-obfuscator": "^1.2.2",
         "extend": "^3.0.2"
     },
     "devDependencies": {
-        "@msamblanet/node-project-settings": "^0.2.22",
+        "@msamblanet/node-project-settings": "^0.2.24",
         "@types/extend": "^3.0.1",
         "@types/jest": "^27.0.1",
         "@types/mocha": "^9.0.0",
@@ -72,13 +72,15 @@
         "dotenv": "^10.0.0",
         "eslint": "^7.32.0",
         "jest": "^27.1.0",
+        "memfs": "^3.2.4",
         "nodemon": "^2.0.12",
         "npm-check-updates": "^11.8.5",
         "opener": "^1.5.2",
         "source-map-support": "^0.5.19",
         "ts-jest": "^27.0.5",
         "ts-node": "^10.2.1",
-        "typescript": "^4.4.2"
+        "typescript": "^4.4.2",
+        "unionfs": "^4.4.0"
     },
     "engines": {
         "node": ">=16.7.0"
