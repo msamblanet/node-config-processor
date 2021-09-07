@@ -81,7 +81,7 @@ test("Check Obfuscate String", () => {
 });
 
 test("No obfuscation in processor config", () => {
-    const cfg: Lib.RootConfigOverrides = {
+    const cfg: Lib.RootConfigOverride = {
         configProcessor: {
             obfuscator: {
                 defaultAlg: `OBF:${obfString1}`
@@ -137,5 +137,4 @@ test("Verify Config arg patterns", () => {
     expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: 9 }).process()).toMatchObject({ a: 9 });
     expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: null }).process()).toMatchObject({ a: null });
     expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: undefined }).process()).toMatchObject({ a: { b: 1, c: 2 } });
-
 });

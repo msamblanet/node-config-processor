@@ -1,54 +1,42 @@
 /* This is needed to allow this to work in ts-node for testing - see: https://github.com/TypeStrong/ts-node#help-my-types-are-missing */
 /// <reference types="./@types/msamblanet__deep-iterator" />
-import { Obfuscator, ObfuscatorConfigOverrides } from "@msamblanet/node-obfuscator";
-//import { NodeType } from "@msamblanet/deep-iterator";
+import { Obfuscator, ObfuscatorConfigOverride } from "@msamblanet/node-obfuscator";
 import deepIterator from "@msamblanet/deep-iterator";
-import extend from "extend";
+import { Config, Override, BaseConfigurable } from "@msamblanet/node-config-types";
 import fs from "fs";
 import crypto from "crypto";
-
-export type AllOptional<T> = {
-    [P in keyof T]?: T[P];
-};
-export type RecursiveAllOptional<T> = {
-    [P in keyof T]?: RecursiveAllOptional<T[P]>;
-};
-
-export type Config = Record<string | number | symbol, unknown>
+import extend from "extend";
 
 export interface ConfigProcessorConfig extends Config {
-    obfuscator?: ObfuscatorConfigOverrides
+    obfuscator?: ObfuscatorConfigOverride
 }
-export type ConfigProcessorConfigOverrides = AllOptional<ConfigProcessorConfig>;
+export type ConfigProcessorConfigOverrides = Override<ConfigProcessorConfig>;
 
 export interface RootConfig extends Config {
     configProcessor: ConfigProcessorConfig
 }
-export type RootConfigOverrides = AllOptional<RootConfig>;
+export type RootConfigOverride = Override<RootConfig>;
 
-export class ConfigProcessor<X extends RootConfig> {
+export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
     public static readonly OP_MATCHER = /^(RAW|HEX|B64|ENV|FILE|OBF|SFILE([0-9]+)):/;
-    public static readonly DEFAULT_CONFIG: Config = {}
+    public static readonly DEFAULT_CONFIG: RootConfig = { configProcessor: {} }
 
-    private readonly rootConfig: X
-    private readonly config: ConfigProcessorConfig
-    private readonly obfuscator: Obfuscator
+    protected obfConfig: ObfuscatorConfigOverride
+    protected obfuscator: Obfuscator
 
-    public constructor(...config: (RootConfigOverrides|null|undefined)[]) {
-        this.rootConfig = extend(true, { configProcessor: {} }, ...config);
+    public constructor(...config: RootConfigOverride[]) {
+        super(ConfigProcessor.DEFAULT_CONFIG as X, ...config);
 
-        const rawConfig = extend(true, {}, ConfigProcessor.DEFAULT_CONFIG, this.rootConfig.configProcessor);
-        this.config = this.processObject(rawConfig);
-
-        this.obfuscator = this.getObfuscator();
+        this.obfConfig = this.processObject(extend(true, {}, this.config.configProcessor.obfuscator));
+        this.obfuscator = this.makeObfuscator();
     }
 
     public process(): X {
-        return this.processObject(this.rootConfig);
+        return this.processObject(this.config);
     }
 
-    protected getObfuscator(): Obfuscator {
-        return new Obfuscator((this.config as ConfigProcessorConfig).obfuscator);
+    protected makeObfuscator(): Obfuscator {
+        return new Obfuscator((this.obfConfig as ConfigProcessorConfig).obfuscator);
     }
 
     public obfuscateString(val: string, alg?: string): string {
