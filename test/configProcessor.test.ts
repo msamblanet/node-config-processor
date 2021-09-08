@@ -4,6 +4,8 @@ import LibDefault from "../src/index";
 import Obfuscator from "@msamblanet/node-obfuscator";
 import fs from "fs";
 import crypto from "crypto";
+import { Override } from "@msamblanet/node-config-types";
+import { stringify } from "querystring";
 
 const obf = new Obfuscator();
 const rawString1 = "ObfStr1";
@@ -34,7 +36,24 @@ test("Check Basics", () => {
     process.env["unittest_env_1"] = "98765";
     process.env["unittest_env_2"] = `OBF:${obfString1}`;
 
-    const t = new Lib.ConfigProcessor({
+    interface TestRootConfig extends Lib.RootConfig {
+        a: string,
+        b: boolean,
+        c: unknown,
+        d: null | string,
+        e: [number, string, string|undefined, string|null, boolean],
+        f: string,
+        g: string,
+        h: string,
+        i: string,
+        j: string,
+        k: string,
+        l: string,
+        m: string,
+        n: string,
+    }
+
+    const t = new Lib.ConfigProcessor<TestRootConfig>({
         a: "ABCDE",
         b: true,
         c: undefined,
@@ -74,7 +93,12 @@ test("Check Obfuscate String", () => {
     const t2 = t.obfuscateString("ABCDE");
     const t3 = t.obfuscateString("FGHIJ", Obfuscator.DEFAULT_CONFIG.defaultAlg);
 
-    const t4 = new Lib.ConfigProcessor( { a: `OBF:${t2}`, b: `OBF:${t3}` });
+    interface TestRootConfig extends Lib.RootConfig {
+        a: string,
+        b: string
+    }
+
+    const t4 = new Lib.ConfigProcessor<TestRootConfig>( { a: `OBF:${t2}`, b: `OBF:${t3}` });
     const cfg = t4.process();
 
     expect(cfg).toMatchObject({ a: "ABCDE", b: "FGHIJ" });
@@ -92,7 +116,11 @@ test("No obfuscation in processor config", () => {
 });
 
 test("Verify FILE", () => {
-    const cfg = new Lib.ConfigProcessor({
+    interface TestRootConfig extends Lib.RootConfig {
+        a: string
+    }
+
+    const cfg = new Lib.ConfigProcessor<TestRootConfig>({
         a: `FILE:${baseDir}/test-file/a.txt`
     }).process();
 
@@ -105,7 +133,12 @@ test("Verify SFILE", () => {
         crypto.randomBytes = (n: number) => {
             return Buffer.from(Array(n).fill(42));
         }
-        const cfg = new Lib.ConfigProcessor({
+        interface TestRootConfig extends Lib.RootConfig {
+            a: string,
+            b: string
+        }
+
+        const cfg = new Lib.ConfigProcessor<TestRootConfig>({
             a: `SFILE8:${baseDir}/test-file/a.txt`,
             b: `SFILE8:${baseDir}/test-file/b.txt`
         }).process();
@@ -124,17 +157,22 @@ test("Verify Config arg patterns", () => {
     expect(new Lib.ConfigProcessor(undefined).process()).toMatchObject({});
     expect(new Lib.ConfigProcessor({}).process()).toMatchObject({});
 
-    expect(new Lib.ConfigProcessor({ a: 1 }, { b: 2 }).process()).toMatchObject({ a: 1, b: 2 });
-    expect(new Lib.ConfigProcessor({ a: 1 }, { a: 2 }).process()).toMatchObject({ a: 2 });
-    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined).process()).toMatchObject({ a: 1 });
-    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: 2 }).process()).toMatchObject({ a: 2 });
-    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: "" }).process()).toMatchObject({ a: "" });
-    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: null }).process()).toMatchObject({ a: null });
-    expect(new Lib.ConfigProcessor({ a: 1 }, null, undefined, { a: undefined }).process()).toMatchObject({ a: 1 });
+    interface TestRootConfig extends Lib.RootConfig {
+        a: number | string | null | undefined | { b: number, c: number, d: number },
+        b: number
+    }
 
-    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }).process()).toMatchObject({ a: { b: 1, c: 2 } });
-    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: { c: 3, d: 4 } }).process()).toMatchObject({ a: { b: 1, c: 3, d: 4 } });
-    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: 9 }).process()).toMatchObject({ a: 9 });
-    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: null }).process()).toMatchObject({ a: null });
-    expect(new Lib.ConfigProcessor({ a: { b: 1, c: 2 } }, { a: undefined }).process()).toMatchObject({ a: { b: 1, c: 2 } });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: 1 }, { b: 2 }).process()).toMatchObject({ a: 1, b: 2 });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: 1 }, { a: 2 }).process()).toMatchObject({ a: 2 });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: 1 }, null, undefined).process()).toMatchObject({ a: 1 });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: 1 }, null, undefined, { a: 2 }).process()).toMatchObject({ a: 2 });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: 1 }, null, undefined, { a: "" }).process()).toMatchObject({ a: "" });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: 1 }, null, undefined, { a: null }).process()).toMatchObject({ a: null });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: 1 }, null, undefined, { a: undefined }).process()).toMatchObject({ a: 1 });
+
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: { b: 1, c: 2 } }).process()).toMatchObject({ a: { b: 1, c: 2 } });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: { b: 1, c: 2 } }, { a: { c: 3, d: 4 } }).process()).toMatchObject({ a: { b: 1, c: 3, d: 4 } });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: { b: 1, c: 2 } }, { a: 9 }).process()).toMatchObject({ a: 9 });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: { b: 1, c: 2 } }, { a: null }).process()).toMatchObject({ a: null });
+    expect(new Lib.ConfigProcessor<TestRootConfig>({ a: { b: 1, c: 2 } }, { a: undefined }).process()).toMatchObject({ a: { b: 1, c: 2 } });
 });

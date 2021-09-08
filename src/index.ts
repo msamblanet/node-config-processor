@@ -24,7 +24,7 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
     protected obfConfig: ObfuscatorConfigOverride
     protected obfuscator: Obfuscator
 
-    public constructor(...config: RootConfigOverride[]) {
+    public constructor(...config: Override<X>[]) {
         super(ConfigProcessor.DEFAULT_CONFIG as X, ...config);
 
         this.obfConfig = this.processObject(extend(true, {}, this.config.configProcessor.obfuscator));

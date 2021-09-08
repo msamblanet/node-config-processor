@@ -43,7 +43,7 @@ import type { Config } from "@msamblanet/node-config-processor";
 import nodeConfig from "config";
 import ConfigProcessor from "@msamblanet/node-config-processor";
 
-export interface ModuleConfig extends RootConfig {
+export interface ModuleConfig extends Config {
     a: number,
     b: number
 };
