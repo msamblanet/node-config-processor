@@ -13,7 +13,7 @@ export interface ConfigProcessorConfig extends Config {
 export type ConfigProcessorConfigOverrides = Override<ConfigProcessorConfig>;
 
 export interface RootConfig extends Config {
-    configProcessor: ConfigProcessorConfig
+    configProcessor?: ConfigProcessorConfig
 }
 export type RootConfigOverride = Override<RootConfig>;
 
@@ -27,7 +27,7 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
     public constructor(...config: Override<X>[]) {
         super(ConfigProcessor.DEFAULT_CONFIG as X, ...config);
 
-        this.obfConfig = this.processObject(extend(true, {}, this.config.configProcessor.obfuscator));
+        this.obfConfig = this.processObject(extend(true, {}, this.config.configProcessor?.obfuscator));
         this.obfuscator = this.makeObfuscator();
     }
 

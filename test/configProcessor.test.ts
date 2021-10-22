@@ -4,8 +4,6 @@ import LibDefault from "../src/index";
 import Obfuscator from "@msamblanet/node-obfuscator";
 import fs from "fs";
 import crypto from "crypto";
-import { Override } from "@msamblanet/node-config-types";
-import { stringify } from "querystring";
 
 const obf = new Obfuscator();
 const rawString1 = "ObfStr1";

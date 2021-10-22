@@ -1,6 +1,6 @@
 {
     "name": "@msamblanet/node-config-processor",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "private": false,
     "description": "Process config data with basic templating",
     "homepage": "https://github.com/msamblanet/node-config-processor",
