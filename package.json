@@ -1,21 +1,24 @@
 {
     "name": "@msamblanet/node-config-processor",
-    "version": "0.1.0",
+    "version": "0.1.5",
     "private": false,
     "description": "Process config data with basic templating",
-    "author": "Michael Samblanet <michael@samblanet.com>",
-    "license": "Apache-2.0",
+    "homepage": "https://github.com/msamblanet/node-config-processor",
+    "bugs": {
+        "url": "https://github.com/msamblanet/node-config-processor/issues"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/msamblanet/node-config-processor.git"
     },
-    "bugs": {
-        "url": "https://github.com/msamblanet/node-config-processor/issues"
-    },
-    "homepage": "https://github.com/msamblanet/node-config-processor",
+    "license": "Apache-2.0",
+    "author": "Michael Samblanet <michael@samblanet.com>",
     "main": "dist/cjs/index.js",
     "module": "dist/mjs/index.js",
     "types": "dist/mjs/index.d.ts",
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "ts-node src/main.ts",
         "debug": "node --inspect -r ts-node/register src/main.ts",
@@ -30,52 +33,55 @@
         "build": "npm run build:clean && npm run build:gen",
         "build:clean": "del-cli dist",
         "build:check": "npm run build:check:mjs && npm run build:check:cjs && npm run test",
-        "build:check:mjs": "tsc --noEmit -p tsconfig-mjs.json",
-        "build:check:cjs": "tsc --noEmit",
+        "build:check:mjs": "tsc --noEmit -p ./node_modules/@msamblanet/node-project-settings/base/tsconfig-mjs.json",
+        "build:check:cjs": "tsc --noEmit -p ./node_modules/@msamblanet/node-project-settings/base/tsconfig-cjs.json",
         "build:gen": "npm run build:gen:mjs && npm run build:gen:cjs",
-        "build:gen:mjs": "tsc -p tsconfig-mjs.json",
-        "build:gen:cjs": "tsc",
+        "build:gen:mjs": "tsc -p ./node_modules/@msamblanet/node-project-settings/base/tsconfig-mjs.json",
+        "build:gen:cjs": "tsc -p ./node_modules/@msamblanet/node-project-settings/base/tsconfig-cjs.json",
         "prepack": "npm run lint && npm run build:check && npm run build",
         "lib:check": "ncu",
         "lib:update:patch": "ncu -u -t patch && npm install",
         "lib:update:minor": "ncu -u -t minor && npm install",
         "lib:update:latest": "ncu -u -t latest && npm install",
-        "lib:update:doctor": "ncu --doctor -u -t latest"
-    },
-    "devDependencies": {
-        "@types/extend": "^3.0.1",
-        "@types/jest": "^27.0.1",
-        "@types/mocha": "^9.0.0",
-        "@types/node": "^16.7.10",
-        "@typescript-eslint/eslint-plugin": "^4.30.0",
-        "del-cli": "^4.0.1",
-        "eslint": "^7.32.0",
-        "jest": "^27.1.0",
-        "nodemon": "^2.0.12",
-        "npm-check-updates": "^11.8.3",
-        "source-map-support": "^0.5.19",
-        "ts-jest": "^27.0.5",
-        "ts-node": "^10.2.1",
-        "typescript": "^4.4.2"
-    },
-    "files": [
-        "dist"
-    ],
-    "engines": {
-        "node": ">=16.7.0"
+        "lib:update:doctor": "ncu --doctor -u -t latest",
+        "test:open": "opener \"./coverage/lcov-report/index.html\"",
+        "applyProjectTemplate": "applyProjectTemplate"
     },
     "nodemonConfig": {
-        "watch": [
-            "src/"
-        ],
-        "ext": "ts",
         "execMap": {
             "ts": "node -r ts-node/register"
-        }
+        },
+        "ext": "ts",
+        "watch": [
+            "src/"
+        ]
     },
     "dependencies": {
         "@msamblanet/deep-iterator": "^1.1.1",
-        "@msamblanet/node-obfuscator": "^1.1.0",
+        "@msamblanet/node-config-types": "^0.2.1",
+        "@msamblanet/node-obfuscator": "^1.2.4",
         "extend": "^3.0.2"
+    },
+    "devDependencies": {
+        "@msamblanet/node-project-settings": "^0.3.3",
+        "@types/extend": "^3.0.1",
+        "@types/jest": "^27.0.1",
+        "@types/node": "^16.9.0",
+        "@typescript-eslint/eslint-plugin": "^4.31.0",
+        "del-cli": "^4.0.1",
+        "eslint": "^7.32.0",
+        "jest": "^27.1.1",
+        "memfs": "^3.2.4",
+        "nodemon": "^2.0.12",
+        "npm-check-updates": "^11.8.5",
+        "opener": "^1.5.2",
+        "source-map-support": "^0.5.19",
+        "ts-jest": "^27.0.5",
+        "ts-node": "^10.2.1",
+        "typescript": "^4.4.2",
+        "unionfs": "^4.4.0"
+    },
+    "engines": {
+        "node": ">=16.7.0"
     }
 }

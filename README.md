@@ -14,6 +14,8 @@ Each string value in a config object is evaluated and processed.  Prefix values 
 - ```B64:``` indicates that the remainder of the string is a base64 encoded UTF8 string.  The decoded value is used raw and NOT recursively processed.
 - ```ENV:``` indicates that the value should be pulled from the environment.  The value is recursively processed, allowing it to be a ```FILE:``` for example.
 - ```FILE:``` indicates that the value should be read from a file.  The value is recursively processed.
+- ```SFILE##:``` indicates that the value should be read from a file but if the file does not exist, a ## byte random hex value will be written to the file.  Useful to allow applications to create random tokens on first startup.
+    - ie: ```SFILE8:/home/app/.myapp/.admin.password``` would read the value from this file or generate an 8-byte (16 character) hex value.
 - ```OBF:``` indicates that the value is obfuscated.  The decoded value is used raw and NOT recursively processed.
 
 ## Recommended Usage
@@ -33,57 +35,63 @@ npm install --save-dev @msamblanet/node-config-processor @types/extend
 ```
 
 ```typescript
-// main.ts
+// moduleConfig.ts
 import dotenv from 'dotenv';
 dotenv.config();
 
-import config from "config";
+import type { Config } from "@msamblanet/node-config-processor";
+import nodeConfig from "config";
 import ConfigProcessor from "@msamblanet/node-config-processor";
-new ConfigProcessor(config).process();
 
-// Your application imports and code go below this line...
-// DO NOT put other imports above this line to ensure nothing else changes the bootstrap order...
+export interface ModuleConfig extends Config {
+    a: number,
+    b: number
+};
+
+export const config = new ConfigProcessor<ModuleConfig>(nodeConfig).process();
+export default config;
+
+// main.ts
+import config from "./moduleConfig"
+
 import Foo from "./Foo";
-const foo = new Foo(config.get("foo"));
+const foo = new Foo(config.foo);
 
 console.log(foo.doStuff());
 
 // Or if you need programatic injection also...later configs take precidence over earlier ones
-const foo2 = new Foo(config.get("foo"), { b: 30127 });
+const foo2 = new Foo(config.foo, { b: 30127 });
 console.log(foo2.doStuff());
-
 ```
 
 ```typescript
 // Foo.ts
 import extend from "extend";
-import type { ConfigOverrides } from "@msamblanet/node-config-processor";
+import type { Config, AllOptional } from "@msamblanet/node-config-processor";
 
-export type = FooConfig {
+export interface FooConfig extends Config {
     a: number;
     b: number;
 }
-
-export type FooConfigOverrides = ConfigOverrides<FooConfig>;
+// Note: If you have deep structure and you need it all optional on overides, use RecursiveAllOptional instead
+export type FooConfigOverrides = AllOptional<FooConfig>;
 
 export class Foo {
-    static readonly DEFAULT_CONFIG: FooConfig = {
+    public static readonly DEFAULT_CONFIG: FooConfig = {
         a: 1,
         b: 2
     }
-    readonly config: FooConfig
+    protected readonly config: FooConfig
 
-    constructor(...config: FooConfigOverrides) {
-        this.config = extend.apply(null, [true, {}, OfficeSdk.DEFAULT_CONFIG, ...config??[]]);
+    public constructor(...config: (FooConfigOverrides|null|undefined)[]) {
+        this.config = extend(true, {}, Foo.DEFAULT_CONFIG, ...config);
     }
 
-    doStuff() {
+    public doStuff() {
         return config.a + config.b;
     }
 }
-
 export default Foo;
-
 ```
 
 ```yaml
