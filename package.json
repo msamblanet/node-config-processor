@@ -69,7 +69,7 @@
         "@types/node": "^16.9.0",
         "@typescript-eslint/eslint-plugin": "^4.31.0",
         "del-cli": "^4.0.1",
-        "eslint": "^7.32.0",
+        "eslint": "^8.0.1",
         "jest": "^27.1.1",
         "memfs": "^3.2.4",
         "nodemon": "^2.0.12",
