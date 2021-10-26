@@ -1,6 +1,6 @@
 {
     "name": "@msamblanet/node-config-processor",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "private": false,
     "description": "Process config data with basic templating",
     "homepage": "https://github.com/msamblanet/node-config-processor",
@@ -115,13 +115,13 @@
         "verbose": false
     },
     "dependencies": {
-        "@msamblanet/deep-iterator": "^2.0.0",
-        "@msamblanet/node-config-types": "^0.3.1",
-        "@msamblanet/node-obfuscator": "^2.0.0",
+        "@msamblanet/deep-iterator": "^2.0.1",
+        "@msamblanet/node-config-types": "^0.3.2",
+        "@msamblanet/node-obfuscator": "^2.0.1",
         "extend": "^3.0.2"
     },
     "devDependencies": {
-        "@msamblanet/node-project-template": "^0.6.2",
+        "@msamblanet/node-project-template": "^0.7.0",
         "@types/extend": "^3.0.1",
         "memfs": "^3.3.0",
         "unionfs": "^4.4.0"
