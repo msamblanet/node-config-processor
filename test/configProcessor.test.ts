@@ -1,7 +1,9 @@
- // Must import mocks before any modules imported
-import { jest } from '@jest/globals'
+// Must import mocks before any modules imported
+/* eslint-disable import/first,import/order,node/no-unsupported-features/es-syntax */
+import { jest } from '@jest/globals'; // eslint-disable-line import/no-extraneous-dependencies
 import MockFs from './MockFs.js';
 import MockRandom from './MockRandom.js';
+
 const mockFs = new MockFs(jest);
 const mockRandom = new MockRandom(jest);
 
@@ -40,7 +42,7 @@ test('Check Exports', () => {
   expect(Lib).not.toBeNull();
   expect(Lib.ConfigProcessor).not.toBeNull();
 
-  //expect(LibDefault).toEqual(Lib.ConfigProcessor);
+  // expect(LibDefault).toEqual(Lib.ConfigProcessor);
 });
 
 test('Check Basics', () => {
@@ -191,20 +193,20 @@ test('Coherce bool', () => {
     a: boolean;
     b: boolean;
     c: boolean;
-    d: boolean|undefined;
+    d: boolean | undefined;
     e: boolean;
     f: boolean;
     g: boolean;
   }
 
   const t = new Lib.ConfigProcessor<TestRootConfig>({
-    a: "BOOL:true",
-    b: "BOOL:1",
-    c: "BOOL:yes",
-    d: "BOOL:",
-    e: "BOOL:false",
-    f: "BOOL:0",
-    g: "BOOL:ENV:unittest_env_1"
+    a: 'BOOL:true',
+    b: 'BOOL:1',
+    c: 'BOOL:yes',
+    d: 'BOOL:',
+    e: 'BOOL:false',
+    f: 'BOOL:0',
+    g: 'BOOL:ENV:unittest_env_1'
   });
   const cfg = t.process();
 
@@ -217,7 +219,7 @@ test('Coherce bool', () => {
   expect(cfg.f).toEqual(false);
   expect(cfg.g).toEqual(true);
 
-  expect(t.coherceBool("")).toEqual(undefined);
+  expect(t.coherceBool('')).toEqual(undefined);
   expect(t.coherceBool(undefined)).toEqual(undefined);
   expect(t.coherceBool(null)).toEqual(null);
   expect(t.coherceBool(1)).toEqual(true);
@@ -225,10 +227,10 @@ test('Coherce bool', () => {
   expect(t.coherceBool(2)).toEqual(false);
   expect(t.coherceBool(true)).toEqual(true);
   expect(t.coherceBool(false)).toEqual(false);
-  expect(t.coherceBool("true")).toEqual(true);
-  expect(t.coherceBool("false")).toEqual(false);
-  expect(t.coherceBool("yes")).toEqual(true);
-  expect(t.coherceBool("garbage")).toEqual(false);
+  expect(t.coherceBool('true')).toEqual(true);
+  expect(t.coherceBool('false')).toEqual(false);
+  expect(t.coherceBool('yes')).toEqual(true);
+  expect(t.coherceBool('garbage')).toEqual(false);
 });
 
 test('Coherce int', () => {
@@ -236,16 +238,16 @@ test('Coherce int', () => {
 
   interface TestRootConfig extends RootConfig {
     a: number;
-    b: number|undefined;
+    b: number | undefined;
     c: number;
     d: number;
   }
 
   const t = new Lib.ConfigProcessor<TestRootConfig>({
-    a: "INT:10",
-    b: "INT:",
-    c: "INT:0",
-    d: "INT:ENV:unittest_env_1"
+    a: 'INT:10',
+    b: 'INT:',
+    c: 'INT:0',
+    d: 'INT:ENV:unittest_env_1'
   });
   const cfg = t.process();
 
@@ -255,15 +257,14 @@ test('Coherce int', () => {
   expect(cfg.c).toEqual(0);
   expect(cfg.d).toEqual(42);
 
-
-  expect(t.coherceInt("", 10)).toEqual(undefined);
+  expect(t.coherceInt('', 10)).toEqual(undefined);
   expect(t.coherceInt(undefined, 10)).toEqual(undefined);
   expect(t.coherceInt(null, 10)).toEqual(null);
   expect(t.coherceInt(42, 10)).toEqual(42);
-  expect(t.coherceInt("42", 10)).toEqual(42);
-  expect(t.coherceInt("042", 10)).toEqual(42);
-  expect(t.coherceInt("foo", 10)).toEqual(NaN);
-  expect(t.coherceInt("42foo", 10)).toEqual(42);
+  expect(t.coherceInt('42', 10)).toEqual(42);
+  expect(t.coherceInt('042', 10)).toEqual(42);
+  expect(t.coherceInt('foo', 10)).toEqual(Number.NaN);
+  expect(t.coherceInt('42foo', 10)).toEqual(42);
 });
 
 test('Coherce int16', () => {
@@ -271,40 +272,40 @@ test('Coherce int16', () => {
 
   interface TestRootConfig extends RootConfig {
     a: number;
-    b: number|undefined;
+    b: number | undefined;
     c: number;
     d: number;
   }
 
   const t = new Lib.ConfigProcessor<TestRootConfig>({
-    a: "INT16:0000f",
-    b: "INT16:",
-    c: "INT16:1A",
-    d: "INT16:ENV:unittest_env_1"
+    a: 'INT16:0000f',
+    b: 'INT16:',
+    c: 'INT16:1A',
+    d: 'INT16:ENV:unittest_env_1'
   });
   const cfg = t.process();
 
   expect(cfg).not.toBeNull();
   expect(cfg.a).toEqual(15);
   expect(cfg.b).toEqual(undefined);
-  expect(cfg.c).toEqual(0x1a);
-  expect(cfg.d).toEqual(0x1f);
+  expect(cfg.c).toEqual(0x1A);
+  expect(cfg.d).toEqual(0x1F);
 });
 
 test('Coherce int8', () => {
   process.env.unittest_env_1 = '12';
   interface TestRootConfig extends RootConfig {
     a: number;
-    b: number|undefined;
+    b: number | undefined;
     c: number;
     d: number;
   }
 
   const t = new Lib.ConfigProcessor<TestRootConfig>({
-    a: "INT8:07",
-    b: "INT8:",
-    c: "INT8:11",
-    d: "INT8:ENV:unittest_env_1"
+    a: 'INT8:07',
+    b: 'INT8:',
+    c: 'INT8:11',
+    d: 'INT8:ENV:unittest_env_1'
   });
   const cfg = t.process();
 
@@ -313,10 +314,7 @@ test('Coherce int8', () => {
   expect(cfg.b).toEqual(undefined);
   expect(cfg.c).toEqual(9);
   expect(cfg.d).toEqual(10);
-
 });
-
-
 
 const defaultExport = {};
 export default defaultExport;

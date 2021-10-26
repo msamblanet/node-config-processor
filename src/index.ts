@@ -42,6 +42,38 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
     return this.obfuscator.encodeString(value, alg);
   }
 
+  public coherceBool(value: unknown): boolean | null | undefined {
+    switch (value) {
+      case '':
+      case undefined:
+        return undefined;
+      case null: return null;
+      case 1:
+      case '1':
+      case 'true':
+      case true:
+      case 'yes':
+        return true;
+      default: return false;
+    }
+  }
+
+  public coherceInt(value: unknown, radix: number): number | null | undefined {
+    if (value === undefined || value === '') {
+      return undefined;
+    }
+
+    if (value === null) {
+      return null;
+    }
+
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    return Number.parseInt((value as Record<string, unknown>).toString(), radix); // eslint-disable-line @typescript-eslint/no-base-to-string
+  }
+
   protected makeObfuscator(): Obfuscator {
     return new Obfuscator((this.obfConfig as ConfigProcessorConfig).obfuscator);
   }
@@ -105,28 +137,6 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
         /* istanbul ignore next */
       default: throw new Error(`Unknown op processing config for: ${JSON.stringify(nodeDesc)}`);
     }
-  }
-
-  public coherceBool(val: unknown): boolean | null | undefined {
-    switch (val) {
-      case "":
-      case undefined:
-        return undefined;
-      case null: return null;
-      case 1:
-      case "1":
-      case "true":
-      case true:
-      case "yes":
-        return true;
-      default: return false;
-    }
-  }
-  public coherceInt(val: unknown, radix: number): number | null | undefined {
-    if (val === undefined || val === "") return undefined;
-    if (val === null) return null;
-    if (typeof val === "number") return val;
-    return parseInt((val as object).toString(), radix);
   }
 }
 

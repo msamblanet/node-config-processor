@@ -1,8 +1,8 @@
 //
 // Mock node's fs with a union filesystem before we get anywhere
 //
-import type { Jest } from '@jest/environment';
 import type { OpenDirOptions, Dir, Dirent, PathLike } from 'node:fs';
+import type { Jest } from '@jest/environment';
 import { IUnionFs, Union } from 'unionfs';
 import { DirectoryJSON, Volume } from 'memfs';
 
@@ -81,13 +81,10 @@ export class MockFs {
 
     this.unionfs.use(this.nodeFs);
 
-    jestObject.unstable_mockModule('node:fs', () => {
-      return { default: this.unionfs };
-    });
+    const mock = { default: this.unionfs };
 
-    jestObject.unstable_mockModule('fs', () => {
-      return { default: this.unionfs };
-    });
+    jestObject.unstable_mockModule('node:fs', () => mock);
+    jestObject.unstable_mockModule('fs', () => mock);
   }
 
   use(fs: FsType): void {
@@ -101,7 +98,7 @@ export class MockFs {
 
   populate(json: DirectoryJSON, cwd?: string): void {
     const vol = Volume.fromJSON(json, cwd) as unknown as FsType;
-    vol.promises.opendir ??= (path, options): Promise<Dir> => this.openDir(path, options);
+    vol.promises.opendir ??= async (path, options): Promise<Dir> => this.openDir(path, options);
     this.use(vol);
   }
 
