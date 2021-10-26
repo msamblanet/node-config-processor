@@ -1,5 +1,9 @@
 # Node Config Processor - Revision History
 
+2021-10-26 - v0.2.1
+- Dependency bumps
+- Add badge to readme
+
 2021-10-25 - v0.2.0
 - Migrate to @msamblanet/node-project-template
 - BREAKING: Update type names for consistency
