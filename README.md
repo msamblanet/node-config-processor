@@ -10,9 +10,13 @@ This project is a utility to process a configuration file to allow for basic tem
 Each string value in a config object is evaluated and processed.  Prefix values are evaluated to check for processing.
 
 - ```RAW:``` indicates that the remainder of the string should be used unaltered.  Useful if your value starts with the same value as one of these prefixes.
-- ```HEX:``` indicates that the remainder of the string is a hex encoded UTF8 string.  The decoded value is used raw and NOT recursively processed.
-- ```B64:``` indicates that the remainder of the string is a base64 encoded UTF8 string.  The decoded value is used raw and NOT recursively processed.
+- ```HEXSTR:``` indicates that the remainder of the string is a hex encoded UTF8 string.  The decoded value is used raw and NOT recursively processed.
+- ```B64STR:``` indicates that the remainder of the string is a base64 encoded UTF8 string.  The decoded value is used raw and NOT recursively processed.
 - ```ENV:``` indicates that the value should be pulled from the environment.  The value is recursively processed, allowing it to be a ```FILE:``` for example.
+- ```BOOL:``` indicates that the value should be converted to a boolean.  The value is recursively processed.
+- ```INT:``` indicates that the value should be converted to an integer.  Strings are converted as base-10.  The value is recursively processed.
+- ```INT16:``` indicates that the value should be converted to an integer.  Strings are converted as base-16.  The value is recursively processed.
+- ```INT8:``` indicates that the value should be converted to an integer.  Strings are converted as base-8.  The value is recursively processed.
 - ```FILE:``` indicates that the value should be read from a file.  The value is recursively processed.
 - ```SFILE##:``` indicates that the value should be read from a file but if the file does not exist, a ## byte random hex value will be written to the file.  Useful to allow applications to create random tokens on first startup.
     - ie: ```SFILE8:/home/app/.myapp/.admin.password``` would read the value from this file or generate an 8-byte (16 character) hex value.
