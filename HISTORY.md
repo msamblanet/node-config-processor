@@ -1,5 +1,8 @@
 # Node Config Processor - Revision History
 
+2021-10-26 - v0.2.2
+- Added "CONFIG" operator
+
 2021-10-26 - v0.2.1
 - Dependency bumps
 - Add badge to readme
