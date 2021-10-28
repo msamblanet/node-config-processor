@@ -14,6 +14,7 @@ Each string value in a config object is evaluated and processed.  Prefix values 
 - ```HEXSTR:``` indicates that the remainder of the string is a hex encoded UTF8 string.  The decoded value is used raw and NOT recursively processed.
 - ```B64STR:``` indicates that the remainder of the string is a base64 encoded UTF8 string.  The decoded value is used raw and NOT recursively processed.
 - ```ENV:``` indicates that the value should be pulled from the environment.  The value is recursively processed, allowing it to be a ```FILE:``` for example.
+  - ```ENV``` may optionally be used as: ```ENV:envVarName:default``` to provide a default if the variable is not found or is empty.
 - ```BOOL:``` indicates that the value should be converted to a boolean.  The value is recursively processed.
 - ```INT:``` indicates that the value should be converted to an integer.  Strings are converted as base-10.  The value is recursively processed.
 - ```INT16:``` indicates that the value should be converted to an integer.  Strings are converted as base-16.  The value is recursively processed.

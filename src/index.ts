@@ -55,13 +55,21 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
       case undefined:
         return undefined;
       case null: return null;
+
+      case 0:
+      case '0':
+      case 'false':
+      case false:
+      case 'no':
+        return false;
+
       case 1:
       case '1':
       case 'true':
       case true:
       case 'yes':
+      default:
         return true;
-      default: return false;
     }
   }
 
@@ -135,7 +143,20 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
       case 'RAW': return value;
       case 'HEXSTR': return Buffer.from(value, 'hex').toString('utf8');
       case 'B64STR': return Buffer.from(value, 'base64').toString('utf8');
-      case 'ENV': return this.processNode(nodePath, process.env[value] ?? '');
+      case 'ENV': {
+        const split = value.indexOf(':');
+        if (split >= 0) {
+          const rv = this.processNode(nodePath, process.env[value.slice(0, split)] ?? '');
+          if (rv === undefined || rv === null || rv === '') {
+            return value.slice(split + 1);
+          }
+
+          return rv;
+        }
+
+        return this.processNode(nodePath, process.env[value] ?? '');
+      }
+
       case 'FILE': return this.processNode(nodePath, fs.readFileSync(value, { encoding: 'utf8' }));
       case 'BOOL': return this.coherceBool(this.processNode(nodePath, value));
       case 'INT': return this.coherceInt(this.processNode(nodePath, value), 10);
@@ -150,13 +171,15 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
         return 'NOT-YET-RESOLVED';
       }
 
-      case 'OBF':
+      case 'OBF': {
         if (!this.obfuscator) {
           throw new Error(`Obfuscator not allowed at this time: ${JSON.stringify(nodePath)}`);
         }
 
         return this.obfuscator?.decodeString(value);
-        /* istanbul ignore next */
+      }
+
+      /* istanbul ignore next */
       default: throw new Error(`Unknown op processing config for: ${JSON.stringify(nodePath)}`);
     }
   }

@@ -224,13 +224,14 @@ test('Coherce bool', () => {
   expect(t.coherceBool(null)).toEqual(null);
   expect(t.coherceBool(1)).toEqual(true);
   expect(t.coherceBool(0)).toEqual(false);
-  expect(t.coherceBool(2)).toEqual(false);
+  expect(t.coherceBool(2)).toEqual(true);
   expect(t.coherceBool(true)).toEqual(true);
   expect(t.coherceBool(false)).toEqual(false);
   expect(t.coherceBool('true')).toEqual(true);
   expect(t.coherceBool('false')).toEqual(false);
   expect(t.coherceBool('yes')).toEqual(true);
-  expect(t.coherceBool('garbage')).toEqual(false);
+  expect(t.coherceBool('no')).toEqual(false);
+  expect(t.coherceBool('garbage')).toEqual(true);
 });
 
 test('Coherce int', () => {
@@ -314,6 +315,35 @@ test('Coherce int8', () => {
   expect(cfg.b).toEqual(undefined);
   expect(cfg.c).toEqual(9);
   expect(cfg.d).toEqual(10);
+});
+
+test('Env Default', () => {
+  process.env.unittest_env_1 = '12';
+  process.env.unittest_env_2 = '0';
+  process.env.unittest_env_3 = '';
+  interface TestRootConfig extends RootConfig {
+    a: string | undefined;
+    b: string | undefined;
+    c: string | undefined;
+    d: string | undefined;
+    e: string | undefined;
+  }
+
+  const t = new Lib.ConfigProcessor<TestRootConfig>({
+    a: 'ENV:__not__defined__:default',
+    b: 'ENV:__not__defined__:',
+    c: 'ENV:unittest_env_1:default',
+    d: 'ENV:unittest_env_2:default',
+    e: 'ENV:unittest_env_3:default'
+  });
+  const cfg = t.process();
+
+  expect(cfg).not.toBeNull();
+  expect(cfg.a).toEqual('default');
+  expect(cfg.b).toEqual('');
+  expect(cfg.c).toEqual('12');
+  expect(cfg.d).toEqual('0');
+  expect(cfg.e).toEqual('default');
 });
 
 test('Defered Config', () => {
