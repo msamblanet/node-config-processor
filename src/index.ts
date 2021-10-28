@@ -48,13 +48,21 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
       case undefined:
         return undefined;
       case null: return null;
+
+      case 0:
+      case '0':
+      case 'false':
+      case false:
+      case 'no':
+        return false;
+
       case 1:
       case '1':
       case 'true':
       case true:
       case 'yes':
+      default:
         return true;
-      default: return false;
     }
   }
 
@@ -122,7 +130,16 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
       case 'RAW': return value;
       case 'HEXSTR': return Buffer.from(value, 'hex').toString('utf8');
       case 'B64STR': return Buffer.from(value, 'base64').toString('utf8');
-      case 'ENV': return this.processNode(nodeDesc, process.env[value] ?? '');
+      case 'ENV': {
+        const split = value.indexOf(':');
+        if (split >= 0) {
+          const rv = this.processNode(nodeDesc, process.env[value.slice(0, split)] ?? '');
+          if (rv == null || rv === "") return value.slice(split+1);
+          return rv;
+        } else {
+          return this.processNode(nodeDesc, process.env[value] ?? '');
+        }
+      }
       case 'FILE': return this.processNode(nodeDesc, fs.readFileSync(value, { encoding: 'utf8' }));
       case 'BOOL': return this.coherceBool(this.processNode(nodeDesc, value));
       case 'INT': return this.coherceInt(this.processNode(nodeDesc, value), 10);

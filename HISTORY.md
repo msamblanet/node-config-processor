@@ -1,5 +1,9 @@
 # Node Config Processor - Revision History
 
+2021-10-26 - v0.3.0
+- Add default option for ENV
+- BREAKING: Altered coherce bool logic to be explicit about false instead of true
+
 2021-10-26 - v0.2.1
 - Dependency bumps
 - Add badge to readme
