@@ -134,24 +134,30 @@ export class ConfigProcessor<X extends RootConfig> extends BaseConfigurable<X> {
         const split = value.indexOf(':');
         if (split >= 0) {
           const rv = this.processNode(nodeDesc, process.env[value.slice(0, split)] ?? '');
-          if (rv == null || rv === "") return value.slice(split+1);
+          if (rv === undefined || rv === null || rv === '') {
+            return value.slice(split + 1);
+          }
+
           return rv;
-        } else {
-          return this.processNode(nodeDesc, process.env[value] ?? '');
         }
+
+        return this.processNode(nodeDesc, process.env[value] ?? '');
       }
+
       case 'FILE': return this.processNode(nodeDesc, fs.readFileSync(value, { encoding: 'utf8' }));
       case 'BOOL': return this.coherceBool(this.processNode(nodeDesc, value));
       case 'INT': return this.coherceInt(this.processNode(nodeDesc, value), 10);
       case 'INT16': return this.coherceInt(this.processNode(nodeDesc, value), 16);
       case 'INT8': return this.coherceInt(this.processNode(nodeDesc, value), 8);
-      case 'OBF':
+      case 'OBF': {
         if (!this.obfuscator) {
           throw new Error(`Obfuscator not allowed at this time: ${JSON.stringify(nodeDesc)}`);
         }
 
         return this.obfuscator?.decodeString(value);
-        /* istanbul ignore next */
+      }
+
+      /* istanbul ignore next */
       default: throw new Error(`Unknown op processing config for: ${JSON.stringify(nodeDesc)}`);
     }
   }
