@@ -346,5 +346,53 @@ test('Env Default', () => {
   expect(cfg.e).toEqual('default');
 });
 
+test('Defered Config', () => {
+  interface TestRootConfig extends RootConfig {
+    foo: string;
+    bar: string;
+    a: {
+      b: string;
+      c: string;
+    };
+    d: number[];
+    e: number;
+  }
+
+  const t = new Lib.ConfigProcessor<TestRootConfig>({
+    foo: 'TEST',
+    bar: 'CONFIG:foo',
+    a: {
+      b: 'TEST2',
+      c: 'CONFIG:a.b'
+    },
+    d: [1, 2, 3],
+    e: 'CONFIG:d.1'
+  });
+  const cfg = t.process();
+
+  expect(cfg).not.toBeNull();
+  expect(cfg.foo).toEqual('TEST');
+  expect(cfg.bar).toEqual('TEST');
+  expect(cfg.a.b).toEqual('TEST2');
+  expect(cfg.a.c).toEqual('TEST2');
+  expect(cfg.d).toEqual([1, 2, 3]);
+  expect(cfg.e).toEqual(2);
+});
+
+test('Recursed Defered Config', () => {
+  process.env.unittest_env_1 = 'CONFIG:foo';
+  interface TestRootConfig extends RootConfig {
+    foo: string;
+    bar: string;
+  }
+
+  const t = new Lib.ConfigProcessor<TestRootConfig>({
+    foo: 'TEST',
+    bar: 'ENV:unittest_env_1'
+  });
+
+  expect(() => t.process()).toThrowError('Cannot use CONFIG in recursed operator: ["bar"]');
+});
+
 const defaultExport = {};
 export default defaultExport;

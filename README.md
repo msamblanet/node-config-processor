@@ -23,6 +23,10 @@ Each string value in a config object is evaluated and processed.  Prefix values 
 - ```SFILE##:``` indicates that the value should be read from a file but if the file does not exist, a ## byte random hex value will be written to the file.  Useful to allow applications to create random tokens on first startup.
     - ie: ```SFILE8:/home/app/.myapp/.admin.password``` would read the value from this file or generate an 8-byte (16 character) hex value.
 - ```OBF:``` indicates that the value is obfuscated.  The decoded value is used raw and NOT recursively processed.
+- ```CONFIG:``` indicates that the value should be pulled from another config value.  This is intended for simple replication of a value.
+  - It cannot be used in a recursive command (like ENV: BOOL: FILE: etc...)
+  - The behavior is not defined or guarenteed if the target is also defined with a CONFIG
+  - The target config should be specified in a syntax compatible with [object-path](https://www.npmjs.com/package/object-path)
 
 ## Recommended Usage
 
